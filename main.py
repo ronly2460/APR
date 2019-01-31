@@ -202,7 +202,9 @@ class APR(nn.Module):
 
         return hr, ndcg, auc
 
-    
+# datasetは付きのレポジトリのデータを使用
+# https://github.com/hexiangnan/adversarial_personalized_ranking
+
 dataset = Dataset("Data/yelp")
 samples = sampling(dataset)
 train = shuffle(samples, 512, dataset)
@@ -215,7 +217,7 @@ model = APR(n_user, n_item, dataset, adv, feed_dicts=eval_d)
 optimizer = optim.SGD(model.parameters(), lr=5e-2)
 
 model.train()
-for epoch in range(3):
+for epoch in range(1000):
     print("epoch", epoch)
     for i in range(1312):
         
@@ -238,7 +240,6 @@ for epoch in range(3):
         model.delta_Q.weight =  nn.Parameter(model.eps * f.normalize(model.embedding_Q.weight.grad, p=2, dim=1))
         
         loss_apr = model.apr_loss(user, (item_pos, item_neg))
-#         model.zero_grad()
         loss_apr.backward()
                               
         # Update the parameters
